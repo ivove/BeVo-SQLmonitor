@@ -33,6 +33,59 @@ Property Hash As %String;
 /// The actual query-text for the query
 Property QueryText As %String(MAXLEN = 9999);
 
+/// Index on the hash and date to optimise agregating on date for a query
+Index idxHashDate on (Hash,Date);
+
+/// Get the last time we collected date for the given query in a given namespace on a given date
+ClassMethod GetLastTime(queryHash as %String,namespace as %String,date as %Date) As %Time
+{
+    Set lastTime = 0
+    &SQL(SELECT ToTime into :time FROM BeVO_SQLMON_Data.BasicSQLStats 
+            WHERE Hash = :queryHash
+            AND "Date" = :date
+            AND Namespace = :namespace
+            ORDER BY ToTime DESC)
+    if ('SQLCODE) { set lastTime = time }
+    Return lastTime
+}
+
+/// Get the total counts for a given query on a given date in a given namespace
+ClassMethod GetTotals(queryHash as %String,namespace as %String, date as %Date) As %DynamicObject
+{
+    set totals = {}
+    set totals.totalHits = ..GetTotalHits(queryHash,namespace,date)
+    set totals.totalTime = ..GetTotalTime(queryHash,namespace,date)
+    return totals
+}
+
+/// Get The total time a given query ran on a given date in a given namespace
+ClassMethod GetTotalTime(queryHash as %String,namespace as %String,date as %Date) As %Numeric
+{
+    set time = 0
+    &SQL(SELECT sum(TotalTime) into :totalTime
+            FROM BeVO_SQLmon_Data.BasicSQLStats
+            WHERE Hash = :queryHash
+            AND Namespace = :namespace
+            AND "Date" = :date
+            GROUP BY Hash)
+    if ('SQLCODE) { set time = totalTime }
+    return time
+}
+
+/// Get The total times a given query ran on a given date in a given namespace
+ClassMethod GetTotalHits(queryHash as %String,namespace as %String,date as %Date) As %Numeric
+{
+    set hits = 0
+    &SQL(SELECT sum(TotalHits) into :totalHits
+            FROM BeVO_SQLmon_Data.BasicSQLStats
+            WHERE Hash = :queryHash
+            AND Namespace = :namespace
+            AND "Date" = :date
+            GROUP BY Hash)
+    if ('SQLCODE) { set hits = totalHits }
+    return hits
+}
+
 Storage Default
 {
 <Data name="BasicSQLStatsDefaultData">
