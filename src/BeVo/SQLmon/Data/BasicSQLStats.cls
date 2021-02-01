@@ -34,10 +34,10 @@ Property Hash As %String;
 Property QueryText As %String(MAXLEN = 9999);
 
 /// Index on the hash and date to optimise agregating on date for a query
-Index idxHashDate on (Hash,Date);
+Index idxHashDate On (Hash, Date);
 
 /// Get the last time we collected date for the given query in a given namespace on a given date
-ClassMethod GetLastTime(queryHash as %String,namespace as %String,date as %Date) As %Time
+ClassMethod GetLastTime(queryHash As %String, namespace As %String, date As %Date) As %Time
 {
     Set lastTime = 0
     &SQL(SELECT ToTime into :time FROM BeVO_SQLMON_Data.BasicSQLStats 
@@ -50,7 +50,7 @@ ClassMethod GetLastTime(queryHash as %String,namespace as %String,date as %Date)
 }
 
 /// Get the total counts for a given query on a given date in a given namespace
-ClassMethod GetTotals(queryHash as %String,namespace as %String, date as %Date) As %DynamicObject
+ClassMethod GetTotals(queryHash As %String, namespace As %String, date As %Date) As %DynamicObject
 {
     set totals = {}
     set totals.totalHits = ..GetTotalHits(queryHash,namespace,date)
@@ -59,7 +59,7 @@ ClassMethod GetTotals(queryHash as %String,namespace as %String, date as %Date) 
 }
 
 /// Get The total time a given query ran on a given date in a given namespace
-ClassMethod GetTotalTime(queryHash as %String,namespace as %String,date as %Date) As %Numeric
+ClassMethod GetTotalTime(queryHash As %String, namespace As %String, date As %Date) As %Numeric
 {
     set time = 0
     &SQL(SELECT sum(TotalTime) into :totalTime
@@ -73,7 +73,7 @@ ClassMethod GetTotalTime(queryHash as %String,namespace as %String,date as %Date
 }
 
 /// Get The total times a given query ran on a given date in a given namespace
-ClassMethod GetTotalHits(queryHash as %String,namespace as %String,date as %Date) As %Numeric
+ClassMethod GetTotalHits(queryHash As %String, namespace As %String, date As %Date) As %Numeric
 {
     set hits = 0
     &SQL(SELECT sum(TotalHits) into :totalHits
