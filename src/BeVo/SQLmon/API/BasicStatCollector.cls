@@ -21,7 +21,7 @@ ClassMethod DataCapture() As %Status
         set namespace = $ORDER(namespaces(namespace))
     }
     // process the gathered data and save it
-    
+    do ..PersistCapture(date,time)
     // reset the sql stats collection flag
     do $system.SQL.SetSQLStatsJob(statsCollection)
 }
