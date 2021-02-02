@@ -55,4 +55,34 @@ ClassMethod DataCaptureNamespace(namespace As %String, returnNamespace As %Strin
     Return $$$OK
 }
 
+/// Persist the captured data
+ClassMethod PersistCapture(date As %Date, time As %Time) As %Status
+{
+    set namespace = $ORDER(^||stats(""))
+    while namespace '= "" {
+        set hash = $ORDER(^||stats(namespace,""))
+        while hash '= "" {
+            set stats = $GET(^||stats(namespace,hash,"stats"))
+            if stats '= "" {
+                set oCapture = ##class(BeVo.SQLMon.Data.BasicSQLStats).%New()
+                set oCapture.Namespace = namespace
+                set oCapture.Date = date
+                set oCapture.ToTime = time
+                set oCapture.FromTime = ##class(BeVo.SQLMon.Data.BasicSQLStats).GetLastTime(hash,namespace,date) + 1
+                set oCapture.RoutineName = $GET(^||stats(namespace,hash,"location"))
+                set oCapture.QueryText = $GET(^||stats(namespace,hash,"queryText"))
+                set oCapture.Hash = hash
+                set oCapture.Variance = $LIST(stats,3)
+                set prevCounts = ##class(BeVo.SQLMon.Data.BasicSQLStats).GetTotals()
+                set oCapture.TotalHits = $LIST(stats,1) - prevCounts.totalHits
+                set oCapture.totalTime = $LIST(stats,2) - prevCounts.totalTime
+                do oCapture.%Save()
+            }
+            set hash = $ORDER(^||stats(namespace,hash))
+        }
+        set namespace = $ORDER(^||stats(namespace))
+    }
+    Return $$$OK
+}
+
 }
