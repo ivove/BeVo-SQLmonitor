@@ -10,6 +10,10 @@ ClassMethod Install()
     do ..CreateRestAPI()
     zn x
     do ..CreateTask()
+    // samples
+    do $system.OBJ.Load("/shared/Samples-data-master/buildsample/Build.DataSample.cls","ck")
+    write " use /shared/Samples-data-master if asked for input",!
+    do ##class(Build.DataSample).Build()
 }
 
 ClassMethod CreateRestAPI()
