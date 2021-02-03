@@ -4,7 +4,6 @@ Class BeVo.SQLMon.API.Installer Extends %RegisteredObject
 ClassMethod Install()
 {
     set x = $NAMESPACE
-    zw x
     ZN "%SYS"
     do ..CreateRole()
     do ..AddRole()
@@ -17,7 +16,7 @@ ClassMethod CreateRestAPI()
 {
     /* unauthenticade */
 
-    set name = "/BeVo/SQLMon"
+    set name = "/BeVo/SQLMon/Basic"
     if '##class(Security.Applications).Exists(name) {
         set cspProperties("AutheEnabled") = 64
         
@@ -34,7 +33,7 @@ ClassMethod CreateRole()
     set name = "BeVo.SQLMon"
     if '##class(Security.Roles).Exists(name) {
         set description = "Role for BeVo.SQLMon application"
-        set recources = "%DB_USER:RW,%Service_Webgateway:U"
+        set recources = "%DB_USER:RW,%Service_Webgateway:U,%Admin_Task:U"
         set tSC = ##class(Security.Roles).Create(name,description,recources)
     }
 }

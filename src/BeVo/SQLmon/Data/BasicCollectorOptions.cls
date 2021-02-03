@@ -14,7 +14,14 @@ Method EnabledGet() As %Boolean
 
 Method EnabledSet(value As %Boolean) As %Status
 {
-    set ^BeVo.SQLmon.Options("Basic","Enabled") = value
+    if value '= i%Enabled{
+        set ^BeVo.SQLmon.Options("Basic","Enabled") = value
+        set task = ..GetCollectorTask()
+        i task '= $$$NULLOREF {
+            set task.Suspended = ('value)
+            do task.%Save()
+        }
+    }
     return $$$OK
 }
 
@@ -29,11 +36,29 @@ Method IntervalSet(value As %Numeric) As %Status
     set done = $$$OK
     if "/5/10/15/30/60/720/1440/"[("/"_value_"/") {
         // only if the interval is acceptable
-        set ^BeVo.SQLmon.Options("Basic","Interval") = value
+        if value '= i%Interval {
+            set ^BeVo.SQLmon.Options("Basic","Interval") = value
+            set task = ..GetCollectorTask()
+            i task '= $$$NULLOREF {
+                set task.DailyIncrement = value
+                do task.%Save()
+            }
+        }
     } else {
         set done = $$$ERROR(52)
     }
     return done
+}
+
+/// get The collector tast
+ClassMethod GetCollectorTask() As %SYS.Task [ Private ]
+{
+    set result = ""
+    set taskId = ##class(%SYS.Task).FindId("BeVo.SQLMon.Basic")
+    i taskId '= "" {
+        set result = ##class(%SYS.Task).%OpenId(taskId)
+    }
+    return result
 }
 
 }
