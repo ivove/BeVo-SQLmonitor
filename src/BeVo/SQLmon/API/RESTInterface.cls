@@ -11,6 +11,7 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 <Routes>
     <Route Url="/Options" Method="GET" Call="GetBasicOptions"/>
     <Route Url="/Options" Method="POST" Call="SetBasicOptions" />
+    <Route Url="/Hits" Method="GET" Call="GetHits"/>
 </Routes>
 }
 
@@ -69,6 +70,13 @@ ClassMethod GetIntervalFromInput(obj As %DynamicObject) As %Integer [ Private ]
         }
     }
     return interval
+}
+
+ClassMethod GetHits() As %Status
+{
+    set result = ##class(BeVo.SQLMon.Data.BasicSQLStats).GetStats()
+    write result.%ToJSON()
+    return $$$OK
 }
 
 }

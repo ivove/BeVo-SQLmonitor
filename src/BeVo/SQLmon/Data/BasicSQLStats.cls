@@ -86,6 +86,83 @@ ClassMethod GetTotalHits(queryHash As %String, namespace As %String, date As %Da
     return hits
 }
 
+/// Get the statistics in a dynamic array of dynamic objects.
+/// <PARAMETER>namespace:  the namespace for which to get the statistics. Leave blanck for all namespaces</PARAMETER>
+/// <PARAMETER>fromDate: the start date for the stats</PARAMETER>
+/// <PARAMETER>fromTime: the start time for the stats, will only be taken into account id start date is given</PARAMETER>
+/// <PARAMETER>toDate: the end date for the stats</PARAMETER>
+/// <PARAMETER>toTime: the end time for the stats, will only be taken into account id end date is given</PARAMETER>
+/// <PARAMETER>sortBy: the field to sort the data by; this can be "hits" (default) to sort by the number of hits or "time" to sort by the time the query ran.</PARAMETER>
+ClassMethod GetStats(namespace As %String = "", fromDate As %Date = "", fromTime As %Time = "", toDate As %Date = "", toTime As %Time = "", sortBy As %String = "hits") As %DynamicArray
+{
+    set result = []
+    set qry = 2
+    set qry(1) = "SELECT sum(TotalHits) as hits,sum(TotalTime) as ""time"",Hash"
+    set qry(2) = "FROM BeVo_SQLMon_Data.BasicSQLStats"
+    set dynd = 0
+    if namespace '= "" {
+        set qry = qry + 1
+        set qry(qry) = "WHERE namespace = ?"
+        set dynd = dynd + 1
+        set dynd(dynd) = namespace
+    }
+    if fromDate '= "" {
+        set qry = qry + 1
+        i qry > 3 { set qry(qry) = "AND FromDate <= ?" }
+        else { set qry(qry) = "WHERE FromDate <= ?" }
+        set dynd = dynd + 1
+        set dynd(dynd) = fromDate
+        if fromTime '= "" {
+            set qry = qry + 1
+            set qry(qry) = "AND FromTime <= ?"
+            set dynd = dynd + 1
+            set dynd(dynd) = fromTime
+        }
+    }
+    if toDate '= "" {
+        set qry = qry + 1
+        i qry > 3 { set qry(qry) = "AND ToDate >= ?" }
+        else { set qry(qry) = "WHERE ToDate >= ?" }
+        set dynd = dynd + 1
+        set dynd(dynd) = toDate
+        if toTime '= "" {
+            set qry = qry + 1
+            set qry(qry) = "AND ToTime >= ?"
+            set dynd = dynd + 1
+            set dynd(dynd) = toTime
+        }
+    }    
+    set qry = qry + 1
+    set qry(qry) = "GROUP BY Hash"
+    set qry = qry + 1
+    set qry(qry) = "ORDER BY hits desc"
+    if sortBy = "time" {
+        set qry(qry) = "ORDER BY time desc"
+    }
+    zw qry
+    set statement = ##class(%SQL.Statement).%New()
+    do statement.%Prepare(.qry)
+    set resultset = statement.%Execute(dynd...)
+    while resultset.%Next() {
+        set line = {}
+        set line.hash = resultset.Hash
+        set line.hits = resultset.hits
+        set line.time = resultset.time
+        set line.query = ..GetQueryText(resultset.Hash)
+        do result.%Push(line)
+    }
+    return result
+}
+
+/// Get the query text from a hash
+ClassMethod GetQueryText(hash As %String) As %String
+{
+    Set result = ""
+    &sql(SELECT QueryText into:txt FROM BeVo_SQLMon_Data.BasicSQLStats where Hash = :hash)
+    i 'SQLCODE,txt '= "" { set result = txt }
+    Return result
+}
+
 Storage Default
 {
 <Data name="BasicSQLStatsDefaultData">
