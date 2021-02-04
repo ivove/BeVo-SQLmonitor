@@ -21,7 +21,7 @@ ClassMethod DataCapture() As %Status
         set namespace = $ORDER(namespaces(namespace))
     }
     // process the gathered data and save it
-    
+    do ..PersistCapture(date,time)
     // reset the sql stats collection flag
     do $system.SQL.SetSQLStatsJob(statsCollection)
 }
@@ -73,9 +73,9 @@ ClassMethod PersistCapture(date As %Date, time As %Time) As %Status
                 set oCapture.QueryText = $GET(^||stats(namespace,hash,"queryText"))
                 set oCapture.Hash = hash
                 set oCapture.Variance = $LIST(stats,3)
-                set prevCounts = ##class(BeVo.SQLMon.Data.BasicSQLStats).GetTotals()
+                set prevCounts = ##class(BeVo.SQLMon.Data.BasicSQLStats).GetTotals(hash,namespace,date)
                 set oCapture.TotalHits = $LIST(stats,1) - prevCounts.totalHits
-                set oCapture.totalTime = $LIST(stats,2) - prevCounts.totalTime
+                set oCapture.TotalTime = $LIST(stats,2) - prevCounts.totalTime
                 do oCapture.%Save()
             }
             set hash = $ORDER(^||stats(namespace,hash))
