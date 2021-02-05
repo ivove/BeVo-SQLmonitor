@@ -51,14 +51,6 @@ const ProductCard = ({ className, product, ...rest }) => {
         <Typography
           align="center"
           color="textPrimary"
-          gutterBottom
-          variant="h4"
-        >
-          {product.title}
-        </Typography>
-        <Typography
-          align="center"
-          color="textPrimary"
           variant="body1"
         >
           {product.description}

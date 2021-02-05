@@ -53,7 +53,7 @@ const BasicLogging = ({ className, isActive, ...rest }) => {
       className={clsx(classes.root, className)}
       {...rest}
     >
-      <Link href="settings">
+      <Link href="settings" underline="none">
         <CardContent>
           <Grid
             container

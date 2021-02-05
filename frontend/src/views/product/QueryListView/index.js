@@ -23,14 +23,14 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const ProductList = () => {
+const QueryList = () => {
   const classes = useStyles();
   const [products] = useState(data);
 
   return (
     <Page
       className={classes.root}
-      title="Products"
+      title="Queries"
     >
       <Container maxWidth={false}>
         <Toolbar />
@@ -71,4 +71,4 @@ const ProductList = () => {
   );
 };
 
-export default ProductList;
+export default QueryList;

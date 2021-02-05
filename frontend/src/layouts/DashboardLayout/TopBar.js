@@ -9,7 +9,8 @@ import {
   Hidden,
   IconButton,
   Toolbar,
-  makeStyles
+  makeStyles,
+  Typography
 } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import NotificationsIcon from '@material-ui/icons/NotificationsOutlined';
@@ -42,6 +43,10 @@ const TopBar = ({
         <RouterLink to="/">
           <Logo />
         </RouterLink>
+        <Box flexGrow={1} />
+        <Typography variant="h2" pl={4}>
+          Bevo SQL Monitor
+        </Typography>
         <Box flexGrow={1} />
         <Hidden mdDown>
           <IconButton color="inherit">
