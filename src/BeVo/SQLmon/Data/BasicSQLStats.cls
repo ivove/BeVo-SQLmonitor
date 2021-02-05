@@ -108,8 +108,8 @@ ClassMethod GetStats(namespace As %String = "", fromDate As %Date = "", fromTime
     }
     if fromDate '= "" {
         set qry = qry + 1
-        i qry > 3 { set qry(qry) = "AND FromDate <= ?" }
-        else { set qry(qry) = "WHERE FromDate <= ?" }
+        i qry > 3 { set qry(qry) = "AND Date <= ?" }
+        else { set qry(qry) = "WHERE Date <= ?" }
         set dynd = dynd + 1
         set dynd(dynd) = fromDate
         if fromTime '= "" {
@@ -121,8 +121,8 @@ ClassMethod GetStats(namespace As %String = "", fromDate As %Date = "", fromTime
     }
     if toDate '= "" {
         set qry = qry + 1
-        i qry > 3 { set qry(qry) = "AND ToDate >= ?" }
-        else { set qry(qry) = "WHERE ToDate >= ?" }
+        i qry > 3 { set qry(qry) = "AND Date >= ?" }
+        else { set qry(qry) = "WHERE Date >= ?" }
         set dynd = dynd + 1
         set dynd(dynd) = toDate
         if toTime '= "" {
@@ -137,7 +137,7 @@ ClassMethod GetStats(namespace As %String = "", fromDate As %Date = "", fromTime
     set qry = qry + 1
     set qry(qry) = "ORDER BY hits desc"
     if sortBy = "time" {
-        set qry(qry) = "ORDER BY time desc"
+        set qry(qry) = "ORDER BY ""time"" desc"
     }
     zw qry,dynd
     set statement = ##class(%SQL.Statement).%New()

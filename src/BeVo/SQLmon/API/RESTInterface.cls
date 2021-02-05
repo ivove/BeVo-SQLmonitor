@@ -11,7 +11,7 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 <Routes>
     <Route Url="/Options" Method="GET" Call="GetBasicOptions"/>
     <Route Url="/Options" Method="POST" Call="SetBasicOptions" />
-    <Route Url="/Hits" Method="GET" Call="GetHits"/>
+    <Route Url="/Hits" Method="POST" Call="GetHits"/>
 </Routes>
 }
 
@@ -77,15 +77,13 @@ ClassMethod GetHits() As %Status
     set (namespace,fromDate,fromTime,toDate,toTime,sort) = ""
     if %request.Content {
         set obj = {}.%FromJSON(%request.Content)
-        zw obj
-        set namespace = obj.%Get(namespace,"")
-        set fromDate = obj.%Get(fromDate,"")
-        set fromTime = obj.%Get(fromTime,"")
-        set toDate = obj.%Get(toDate,"")
-        set toTime = obj.%Get(toTime,"")
-        set sort = obj.%Get(sort,"")
+        set namespace = obj.%Get("namespace","")
+        set fromDate = obj.%Get("fromDate","")
+        set fromTime = obj.%Get("fromTime","")
+        set toDate = obj.%Get("toDate","")
+        set toTime = obj.%Get("toTime","")
+        set sort = obj.%Get("sort","")
     }
-    w namespace,!
     set result = ##class(BeVo.SQLMon.Data.BasicSQLStats).GetStats(namespace,fromDate,fromTime,toDate,toTime,sort)
     write result.%ToJSON()
     return $$$OK
