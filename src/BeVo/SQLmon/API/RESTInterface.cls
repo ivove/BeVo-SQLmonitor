@@ -74,7 +74,19 @@ ClassMethod GetIntervalFromInput(obj As %DynamicObject) As %Integer [ Private ]
 
 ClassMethod GetHits() As %Status
 {
-    set result = ##class(BeVo.SQLMon.Data.BasicSQLStats).GetStats()
+    set (namespace,fromDate,fromTime,toDate,toTime,sort) = ""
+    if %request.Content {
+        set obj = {}.%FromJSON(%request.Content)
+        zw obj
+        set namespace = obj.%Get(namespace,"")
+        set fromDate = obj.%Get(fromDate,"")
+        set fromTime = obj.%Get(fromTime,"")
+        set toDate = obj.%Get(toDate,"")
+        set toTime = obj.%Get(toTime,"")
+        set sort = obj.%Get(sort,"")
+    }
+    w namespace,!
+    set result = ##class(BeVo.SQLMon.Data.BasicSQLStats).GetStats(namespace,fromDate,fromTime,toDate,toTime,sort)
     write result.%ToJSON()
     return $$$OK
 }

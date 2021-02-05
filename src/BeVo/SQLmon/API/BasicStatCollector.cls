@@ -41,9 +41,7 @@ ClassMethod DataCaptureNamespace(namespace As %String, returnNamespace As %Strin
                 if SQLCODE '= 0 { set location = "" }
                 set ^||stats(namespace,hash,"location")=location
                 // get the sql query text 
-                &SQL(SELECT  Statement INTO :statement FROM INFORMATION_SCHEMA.STATEMENTS WHERE Hash=:hash)
-                if SQLCODE '= 0 { set statement = "" }
-                set ^||stats(namespace,hash,"queryText")=statement
+                set ^||stats(namespace,hash,"queryText")=$GET(^rINDEXSQL("sqlidx",1,hash,"stat",date,1,1))
             }
             set hash = $ORDER(^rINDEXSQL("sqlidx",1,hash))
         }

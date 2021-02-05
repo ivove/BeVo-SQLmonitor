@@ -97,7 +97,7 @@ ClassMethod GetStats(namespace As %String = "", fromDate As %Date = "", fromTime
 {
     set result = []
     set qry = 2
-    set qry(1) = "SELECT sum(TotalHits) as hits,sum(TotalTime) as ""time"",Hash"
+    set qry(1) = "SELECT sum(TotalHits) as hits,sum(TotalTime) as ""time"",Namespace,Hash"
     set qry(2) = "FROM BeVo_SQLMon_Data.BasicSQLStats"
     set dynd = 0
     if namespace '= "" {
@@ -133,19 +133,20 @@ ClassMethod GetStats(namespace As %String = "", fromDate As %Date = "", fromTime
         }
     }    
     set qry = qry + 1
-    set qry(qry) = "GROUP BY Hash"
+    set qry(qry) = "GROUP BY Namespace,Hash"
     set qry = qry + 1
     set qry(qry) = "ORDER BY hits desc"
     if sortBy = "time" {
         set qry(qry) = "ORDER BY time desc"
     }
-    zw qry
+    zw qry,dynd
     set statement = ##class(%SQL.Statement).%New()
-    do statement.%Prepare(.qry)
+    set status = statement.%Prepare(.qry)
     set resultset = statement.%Execute(dynd...)
     while resultset.%Next() {
         set line = {}
         set line.hash = resultset.Hash
+        set line.namespace = resultset.NameSpace
         set line.hits = resultset.hits
         set line.time = resultset.time
         set line.query = ..GetQueryText(resultset.Hash)
