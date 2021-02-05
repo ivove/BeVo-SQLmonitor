@@ -10,10 +10,15 @@ ClassMethod Install()
     do ..CreateRestAPI()
     zn x
     do ..CreateTask()
+    &sql(GRANT SELECT ON BeVo_SQLMon_Data.BasicSQLStats TO "BeVo.SQLMon")
     // samples
-    do $system.OBJ.Load("/shared/Samples-data-master/buildsample/Build.DataSample.cls","ck")
-    write " use /shared/Samples-data-master if asked for input",!
-    do ##class(Build.DataSample).Build()
+    write "Load Samples? (Y/N): "
+    read samples
+    if $ZCONVERT(samples,"U")="Y" {
+        do $system.OBJ.Load("/shared/Samples-data-master/buildsample/Build.DataSample.cls","ck")
+        write " use /shared/Samples-data-master if asked for input",!
+        do ##class(Build.DataSample).Build()
+    }
 }
 
 ClassMethod CreateRestAPI()

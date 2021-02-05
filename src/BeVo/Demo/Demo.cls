@@ -97,14 +97,14 @@ ClassMethod DynamicQuery() As %Status
         SET rset = tStatement.%Execute()
         DO rset.%Display()
     } elseif choice = 3 {
-        SET myquery = "SELECT ID,Name FROM SAMPLE.Vendor where DiscRate < 5"
+        SET myquery = "SELECT Name FROM SAMPLE.Vendor where DiscRate < 5"
         SET tStatement = ##class(%SQL.Statement).%New()
         SET qStatus = tStatement.%Prepare(myquery)
         IF qStatus'=1 {WRITE "%Prepare failed:" DO $System.Status.DisplayError(qStatus) QUIT}
         SET rset = tStatement.%Execute()
         DO rset.%Display()
     } elseif choice = 4 {
-        SET myquery = "SELECT ID Name,Title,Salary FROM SAMPLE.employee where salary > 75000"
+        SET myquery = "SELECT Name,Title,Salary FROM SAMPLE.employee where salary > 75000"
         SET tStatement = ##class(%SQL.Statement).%New()
         SET qStatus = tStatement.%Prepare(myquery)
         IF qStatus'=1 {WRITE "%Prepare failed:" DO $System.Status.DisplayError(qStatus) QUIT}
