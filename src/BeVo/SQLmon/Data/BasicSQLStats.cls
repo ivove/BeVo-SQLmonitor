@@ -108,26 +108,26 @@ ClassMethod GetStats(namespace As %String = "", fromDate As %Date = "", fromTime
     }
     if fromDate '= "" {
         set qry = qry + 1
-        i qry > 3 { set qry(qry) = "AND Date <= ?" }
-        else { set qry(qry) = "WHERE Date <= ?" }
+        i qry > 3 { set qry(qry) = "AND ""Date"" >= ?" }
+        else { set qry(qry) = "WHERE ""Date"" >= ?" }
         set dynd = dynd + 1
         set dynd(dynd) = fromDate
         if fromTime '= "" {
             set qry = qry + 1
-            set qry(qry) = "AND FromTime <= ?"
+            set qry(qry) = "AND FromTime >= ?"
             set dynd = dynd + 1
             set dynd(dynd) = fromTime
         }
     }
     if toDate '= "" {
         set qry = qry + 1
-        i qry > 3 { set qry(qry) = "AND Date >= ?" }
-        else { set qry(qry) = "WHERE Date >= ?" }
+        i qry > 3 { set qry(qry) = "AND ""Date"" <= ?" }
+        else { set qry(qry) = "WHERE ""Date"" <= ?" }
         set dynd = dynd + 1
         set dynd(dynd) = toDate
         if toTime '= "" {
             set qry = qry + 1
-            set qry(qry) = "AND ToTime >= ?"
+            set qry(qry) = "AND ToTime <= ?"
             set dynd = dynd + 1
             set dynd(dynd) = toTime
         }

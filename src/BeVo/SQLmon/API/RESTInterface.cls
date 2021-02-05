@@ -79,9 +79,13 @@ ClassMethod GetHits() As %Status
         set obj = {}.%FromJSON(%request.Content)
         set namespace = obj.%Get("namespace","")
         set fromDate = obj.%Get("fromDate","")
+        if fromDate '= "" { set fromDate = $ZDATEH(fromDate) }
         set fromTime = obj.%Get("fromTime","")
+        if fromTime '= "" { set fromTime = $ZTIMEH(fromTime) }
         set toDate = obj.%Get("toDate","")
+        if toDate '= "" { set toDate = $ZDATEH(toDate) }
         set toTime = obj.%Get("toTime","")
+        if toTime '= "" { set toTime = $ZTIMEH(toTime) }
         set sort = obj.%Get("sort","")
     }
     set result = ##class(BeVo.SQLMon.Data.BasicSQLStats).GetStats(namespace,fromDate,fromTime,toDate,toTime,sort)
