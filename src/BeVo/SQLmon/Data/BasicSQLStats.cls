@@ -139,7 +139,6 @@ ClassMethod GetStats(namespace As %String = "", fromDate As %Date = "", fromTime
     if sortBy = "time" {
         set qry(qry) = "ORDER BY ""time"" desc"
     }
-    zw qry,dynd
     set statement = ##class(%SQL.Statement).%New()
     set status = statement.%Prepare(.qry)
     set resultset = statement.%Execute(dynd...)
