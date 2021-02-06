@@ -154,6 +154,54 @@ ClassMethod GetStats(namespace As %String = "", fromDate As %Date = "", fromTime
     return result
 }
 
+/// Get the statistics for a given query
+/// <PARAMETER>queryHash: the hash identifying the query</PARAMETER>
+/// <PARAMETER>namespace: optionaly the namespace the query was ran in</PARAMETER>
+/// <PARAMETER>fromDate: optionaly a starting date for the stats</PARAMETER>
+/// <PARAMETER>toDate: optionaly an end date for the stats </PARAMETER>
+ClassMethod GetQueryStats(queryHash As %String, namespace As %String = "", fromDate As %Date = "", toDate As %Date = "") As %DynamicArray
+{
+    Set result = []
+    set qry = 3
+    set qry(1) = "SELECT ""date"",Hash,QueryText,Namespace,FromTime,ToTime,RoutineName,TotalTime,TotalHits,Variance"
+    set qry(2) = "FROM BeVo_SQLMon_Data.BasicSQLStats"
+    set qry(3) = "Where Hash = ?"
+    set dynd = 1
+    set dynd(1) = queryHash
+    if fromDate '= "" {
+        set qry = qry + 1
+        set qry(qry) = "AND ""Date"" >= ?" 
+        set dynd = dynd + 1
+        set dynd(dynd) = fromDate
+    }
+    if toDate '= "" {
+        set qry = qry + 1
+        set qry(qry) = "AND ""Date"" <= ?" 
+        set dynd = dynd + 1
+        set dynd(dynd) = toDate
+    }    
+    set qry = qry + 1
+    set qry(qry) = "ORDER BY ID asc"
+    set statement = ##class(%SQL.Statement).%New()
+    set status = statement.%Prepare(.qry)
+    set resultset = statement.%Execute(dynd...)
+    while resultset.%Next() {
+        set line = {}
+        set line.hash = resultset.Hash
+        set line.namespace = resultset.NameSpace
+        set line.queryText = resultset.QueryText
+        set line.date = resultset.Date
+        set line.fromTime = resultset.FromTime
+        set line.toTime = resultset.toTime
+        set line.routine = resultset.RoutineName
+        set line.hits = resultset.TotalHits
+        set line.time = resultset.TotalTime
+        set line.variance = resultset.Variance
+        do result.%Push(line)
+    }
+    Return result
+}
+
 /// Get the query text from a hash
 ClassMethod GetQueryText(hash As %String) As %String
 {

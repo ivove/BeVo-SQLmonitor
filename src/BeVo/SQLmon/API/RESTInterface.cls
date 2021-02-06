@@ -12,6 +12,7 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
     <Route Url="/Options" Method="GET" Call="GetBasicOptions"/>
     <Route Url="/Options" Method="POST" Call="SetBasicOptions" />
     <Route Url="/Hits" Method="POST" Call="GetHits"/>
+    <Route Url="/Query" Method="POST" Call="GetQuery"/>
 </Routes>
 }
 
@@ -90,6 +91,30 @@ ClassMethod GetHits() As %Status
     }
     set result = ##class(BeVo.SQLMon.Data.BasicSQLStats).GetStats(namespace,fromDate,fromTime,toDate,toTime,sort)
     write result.%ToJSON()
+    return $$$OK
+}
+
+ClassMethod GetQuery() As %Status
+{
+    set (namespace,fromDate,fromTime,toDate,toTime,sort) = ""
+    if %request.Content {
+        set obj = {}.%FromJSON(%request.Content)
+        set hash = obj.%Get("queryHash","")
+        set namespace = obj.%Get("namespace","")
+        set fromDate = obj.%Get("fromDate","")
+        if fromDate '= "" { set fromDate = $ZDATEH(fromDate) }
+        set toDate = obj.%Get("toDate","")
+        if toDate '= "" { set toDate = $ZDATEH(toDate) }
+    }
+    if hash = "" {
+        set %response.Status = ..#HTTP400BADREQUEST
+        set error = {"errormessage" : "a queryhash must be suplied"}
+        write error.%ToJSON()
+    }
+    else {
+        set result = ##class(BeVo.SQLMon.Data.BasicSQLStats).GetQueryStats(hash,namespace,fromDate,toDate)
+        write result.%ToJSON()
+    }
     return $$$OK
 }
 
