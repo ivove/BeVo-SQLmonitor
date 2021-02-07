@@ -31,7 +31,17 @@ ClassMethod CreateRestAPI()
         
         set cspProperties("NameSpace") = "USER"
         set cspProperties("IsNameSpaceDefault") = 0
-        set cspProperties("DispatchClass") = "BeVo.SQLMon.API.RESTInterface"
+        set cspProperties("DispatchClass") = "BeVo.SQLMon.API.BasicInterface"
+        
+        set tSC = ##class(Security.Applications).Create(name, .cspProperties)
+    }
+    set name = "/BeVo/SQLMon/Advanced"
+    if '##class(Security.Applications).Exists(name) {
+        set cspProperties("AutheEnabled") = 64
+        
+        set cspProperties("NameSpace") = "USER"
+        set cspProperties("IsNameSpaceDefault") = 0
+        set cspProperties("DispatchClass") = "BeVo.SQLMon.API.AdvancedInterface"
         
         set tSC = ##class(Security.Applications).Create(name, .cspProperties)
     }

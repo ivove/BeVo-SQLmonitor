@@ -1,5 +1,5 @@
-/// The rest interface for the SQLMon application
-Class BeVo.SQLMon.API.RESTInterface Extends %CSP.REST
+/// The basic rest interface for the SQLMon application
+Class BeVo.SQLMon.API.BasicInterface Extends %CSP.REST
 {
 
 Parameter CONTENTTYPE = "application/json";
