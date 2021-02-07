@@ -16,10 +16,14 @@ Method EnabledSet(value As %Boolean) As %Status
 {
     if value '= i%Enabled{
         set ^BeVo.SQLmon.Options("Basic","Enabled") = value
+        set calcTask = ..GetCalculateTask()
         set task = ..GetCollectorTask()
         i task '= $$$NULLOREF {
             set task.Suspended = ('value)
             do task.%Save()
+        }
+        i calcTask '= $$$NULLOREF, 'value {
+            set calcTask.DailyIncrement = 60
         }
     }
     return $$$OK
@@ -38,7 +42,7 @@ Method IntervalSet(value As %Numeric) As %Status
         // only if the interval is acceptable
         if value '= i%Interval {
             set ^BeVo.SQLmon.Options("Basic","Interval") = value
-            set task = ..GetCollectorTask()
+            set task = ..GetCalculateTask()
             i task '= $$$NULLOREF {
                 set task.DailyIncrement = value
                 do task.%Save()
@@ -53,8 +57,19 @@ Method IntervalSet(value As %Numeric) As %Status
 /// get The collector tast
 ClassMethod GetCollectorTask() As %SYS.Task [ Private ]
 {
-    set result = ""
+    set result = $$$NULLOREF
     set taskId = ##class(%SYS.Task).FindId("BeVo.SQLMon.Basic")
+    i taskId '= "" {
+        set result = ##class(%SYS.Task).%OpenId(taskId)
+    }
+    return result
+}
+
+/// get the task that calculates the statistics this is "Update SQL query statistics"
+ClassMethod GetCalculateTask() As %SYS.Task
+{
+    set result = $$$NULLOREF
+    set taskId = ##class(%SYS.Task).FindId("Update SQL query statistics")
     i taskId '= "" {
         set result = ##class(%SYS.Task).%OpenId(taskId)
     }

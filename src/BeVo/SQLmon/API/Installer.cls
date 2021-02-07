@@ -55,6 +55,7 @@ ClassMethod AddRole()
 ClassMethod CreateTask()
 {
     set taskId = ##class(%SYS.Task).FindId("BeVo.SQLMon.Basic")
+    set calcTask = ##class(BeVo.SQLMon.Data.BasicCollectorOptions).GetCalculateTask()
     if taskId = "" {
         // only create the task if it does not already exist
         set task = ##class(%SYS.Task).%New()
@@ -70,9 +71,10 @@ ClassMethod CreateTask()
         set task.Suspended = 1 // suspend the task so it will not run
         set task.TaskClass = "BeVo.SQLMon.API.BasicCollectorTaks" // set the taskdefinition
         set task.Type = 2
-        set task.TimePeriod = 0
+        set task.TimePeriod = 4
         set task.TimePeriodEvery = 1
         set task.TimePeriodDay = ""
+        set task.RunAfterGUID = calcTask.JobGUID
         do task.%Save()
     }
 }
