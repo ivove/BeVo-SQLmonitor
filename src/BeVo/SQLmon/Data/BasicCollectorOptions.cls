@@ -63,13 +63,13 @@ Method StatusGet() As %String
         set calculateTask = ..GetCalculateTask()
         if calculateTask = $$$NULLOREF { set status = "0 Stats collection enabled but stats calculation task not found" } 
         else {
-            if calculateTask.Suspended = 1 { set status = "0 Stats collection enabled but stats caclulation task disabled" }
+            if calculateTask.Suspended '= 0 { set status = "0 Stats collection enabled but stats caclulation task disabled" }
             elseif calculateTask.DailyIncrement '= ..Interval { set status = "0 The interval defined in the options differs from the interval of the stats calculation task" }
             else {
                 set collectorTasks = ..GetCollectorTask()
                 if collectorTasks = $$$NULLOREF { set status = "0 Stats collection enabled but stats collection task not found" }
                 else {
-                    if collectorTasks.Suspended = 1 { set status = "0 Stats collection enabled but stats collector task disabled" }
+                    if collectorTasks.Suspended '= 0 { set status = "0 Stats collection enabled but stats collector task disabled" }
                     elseif collectorTasks.RunAfterGUID '= calculateTask.JobGUID { set status = "0 The stats collector task in not running after the caclculte task, which should be the case" }
                 }
             }

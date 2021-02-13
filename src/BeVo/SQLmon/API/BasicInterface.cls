@@ -30,7 +30,10 @@ ClassMethod GetBasicOptions() As %Status
         if options.Interval = i { do interval.%Set("selected",1,"boolean") }
         do result.interval.%Push(interval)
     }
-    set result.Status = options.Status
+    set status = options.Status
+    set result.status = {}
+    do result.status.%Set("ok",+status,"boolean")
+    set result.status.message = $PIECE(status," ",2,$LENGTH(status," "))
     write result.%ToJSON()
     Return $$$OK
 }
