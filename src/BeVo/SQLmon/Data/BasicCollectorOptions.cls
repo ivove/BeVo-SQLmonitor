@@ -6,6 +6,8 @@ Property Enabled As %Boolean;
 
 Property Interval As %Numeric;
 
+Property Status As %String;
+
 Method EnabledGet() As %Boolean
 {
     set enabled = $GET(^BeVo.SQLmon.Options("Basic","Enabled"),0)
@@ -52,6 +54,40 @@ Method IntervalSet(value As %Numeric) As %Status
         set done = $$$ERROR(52)
     }
     return done
+}
+
+Method StatusGet() As %String
+{
+    set status = "1"
+    if ..Enabled {
+        set calculateTask = ..GetCalculateTask()
+        if calculateTask = $$$NULLOREF { set status = "0 Stats collection enabled but stats calculation task not found" } 
+        else {
+            if calculateTask.Suspended = 1 { set status = "0 Stats collection enabled but stats caclulation task disabled" }
+            elseif calculateTask.DailyIncrement '= ..Interval { set status = "0 The interval defined in the options differs from the interval of the stats calculation task" }
+            else {
+                set collectorTasks = ..GetCollectorTask()
+                if collectorTasks = $$$NULLOREF { set status = "0 Stats collection enabled but stats collection task not found" }
+                else {
+                    if collectorTasks.Suspended = 1 { set status = "0 Stats collection enabled but stats collector task disabled" }
+                    elseif collectorTasks.RunAfterGUID '= calculateTask.JobGUID { set status = "0 The stats collector task in not running after the caclculte task, which should be the case" }
+                }
+            }
+        }
+    } else {
+        set collectorTasks = ..GetCollectorTask()
+        if collectorTasks '= $$$NULLOREF {
+            if collectorTasks.Suspended = 0 {
+                set status = "0 Stats collection disabled but collector task is running"
+            }
+        }
+    }
+    return status
+}
+
+Method StatusSet(value As %String) As %Status [ Private ]
+{
+    return $$$OK
 }
 
 /// get The collector tast
