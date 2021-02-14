@@ -34,6 +34,7 @@ ClassMethod GetBasicOptions() As %Status
     set result.status = {}
     do result.status.%Set("ok",+status,"boolean")
     set result.status.message = $PIECE(status," ",2,$LENGTH(status," "))
+    set result.namespaces = ..GetNamespaceOptions()
     write result.%ToJSON()
     Return $$$OK
 }
@@ -48,6 +49,9 @@ ClassMethod SetBasicOptions() As %Status
             set options = ##class(BeVo.SQLMon.Data.BasicCollectorOptions).%New()
             set options.Enabled = obj.enabled
             set options.Interval = ..GetIntervalFromInput(obj)
+            if obj.%IsDefined("namespaces") {
+                set options.ExcludedNamespaces = ..SetNamespaceOptions(obj.namespaces)
+            }
             do ..GetBasicOptions()
         } else {
             set %response.Status = ..#HTTP400BADREQUEST
@@ -75,6 +79,42 @@ ClassMethod GetIntervalFromInput(obj As %DynamicObject) As %Integer [ Private ]
         }
     }
     return interval
+}
+
+ClassMethod GetNamespaceOptions() As %DynamicArray [ Private ]
+{
+    set result = []
+    set options = ##class(BeVo.SQLMon.Data.BasicCollectorOptions).%New()
+    set excluded = options.ExcludedNamespaces
+    for i=1:1:$LISTLENGTH(excluded) {
+        set exclLst($LIST(excluded,i))=""
+    }
+    do ##class(%SYS.Namespace).ListAll(.namespaces)
+    set ns = $ORDER(namespaces(""))
+    while ns '= "" {
+        set nsObj = {}
+        set nsObj.namespace = ns
+        if '$DATA(exclLst(ns)) {
+            do nsObj.%Set("enabled",1,"boolean")
+        } else {
+            do nsObj.%Set("enabled",0,"boolean")
+        }
+        do result.%Push(nsObj)
+        set ns=$ORDER(namespaces(ns))
+    }
+    return result
+}
+
+ClassMethod SetNamespaceOptions(options As %DynamicArray) As %List [ Private ]
+{
+    set lst = ""
+    set optionsIter = options.%GetIterator(),key=""
+    while optionsIter.%Next(.key,.value) {
+        if 'value.enabled {
+            set $LIST(lst,$LISTLENGTH(lst)+1) = value.namespace
+        }
+    }
+    return lst
 }
 
 ClassMethod GetHits() As %Status

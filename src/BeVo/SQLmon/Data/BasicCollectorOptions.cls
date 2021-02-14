@@ -8,6 +8,8 @@ Property Interval As %Numeric;
 
 Property Status As %String;
 
+Property ExcludedNamespaces As %List;
+
 Method EnabledGet() As %Boolean
 {
     set enabled = $GET(^BeVo.SQLmon.Options("Basic","Enabled"),0)
@@ -87,6 +89,18 @@ Method StatusGet() As %String
 
 Method StatusSet(value As %String) As %Status [ Private ]
 {
+    return $$$OK
+}
+
+Method ExcludedNamespacesGet() As %List
+{
+    set excluded = $GET(^BeVo.SQLmon.Options("Basic","Excluded"),"")
+    return excluded
+}
+
+Method ExcludedNamespacesSet(value As %List) As %Status
+{
+    set ^BeVo.SQLmon.Options("Basic","Excluded") = value
     return $$$OK
 }
 

@@ -12,6 +12,11 @@ ClassMethod DataCapture() As %Status
     set time = $PIECE($HOROLOG,",",2)
     // get all the namespaces on this system
     do ##class(%SYS.Namespace).ListAll(.namespaces)
+    // Get the excluded namespaces from the options and remove them from the namespace list
+    set excluded = ##class(BeVo.SQLMon.Data.BasicCollectorOptions).%New().ExcludedNamespaces
+    for i=1:1:$LISTLENGTH(excluded) {
+        kill namespaces($LIST(excluded,i))
+    }
     // clean the process-private variable holding the statistics
     kill ^||stats
     // loop over all namespaces to collect data
