@@ -13,6 +13,8 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
     <Route Url="/Options" Method="POST" Call="SetBasicOptions" />
     <Route Url="/Hits" Method="POST" Call="GetHits"/>
     <Route Url="/Query" Method="POST" Call="GetQuery"/>
+    <Route Url="/Top/:number" Method="GET" Call="GetTop" />
+    <Route Url="/Top/:number/:namespace" Method="GET" Call="GetTop" />
 </Routes>
 }
 
