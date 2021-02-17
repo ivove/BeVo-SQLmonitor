@@ -140,6 +140,13 @@ ClassMethod GetHits() As %Status
     return $$$OK
 }
 
+ClassMethod GetTop(number As %Integer = 10, namespace As %String = "") As %Status
+{
+    set result = ##class(BeVo.SQLMon.Data.BasicSQLStats).GetTopHits(number,namespace)
+    write result.%ToJSON()
+    return $$$OK
+}
+
 ClassMethod GetQuery() As %Status
 {
     set (namespace,fromDate,fromTime,toDate,toTime,sort) = ""

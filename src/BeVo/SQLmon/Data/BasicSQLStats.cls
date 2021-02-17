@@ -154,6 +154,44 @@ ClassMethod GetStats(namespace As %String = "", fromDate As %Date = "", fromTime
     return result
 }
 
+ClassMethod GetTopHits(number As %Integer = 10, namespace As %String = "", fromDate As %Date = "", toDate As %Date = "")
+{
+    if fromDate = "" { set fromDate = +$h }
+    if toDate = "" { set toDate = +$h }
+    set result = []
+    set qry = 3
+    set qry(1) = "SELECT TOP ? sum(TotalHits) as hits,sum(TotalTime) as ""time"",Namespace,Hash"
+    set qry(2) = "FROM BeVo_SQLMon_Data.BasicSQLStats"
+    set qry(3) = "WHERE ""Date"">= ? and ""Date""<= ?"
+    set dynd = 3
+    set dynd(1) = number
+    set dynd(2) = fromDate
+    set dynd(3) = toDate
+    if namespace '= "" {
+        set qry = qry + 1
+        set qry(qry) = "And namespace = ?"
+        set dynd = dynd + 1
+        set dynd(dynd) = namespace
+    }    
+    set qry = qry + 1
+    set qry(qry) = "GROUP BY Namespace,Hash"
+    set qry = qry + 1
+    set qry(qry) = "ORDER BY hits desc"
+    set statement = ##class(%SQL.Statement).%New()
+    set status = statement.%Prepare(.qry)
+    set resultset = statement.%Execute(dynd...)
+    while resultset.%Next() {
+        set line = {}
+        set line.hash = resultset.Hash
+        set line.namespace = resultset.NameSpace
+        set line.hits = resultset.hits
+        set line.time = resultset.time
+        set line.query = ..GetQueryText(resultset.Hash)
+        do result.%Push(line)
+    }
+    return result
+}
+
 /// Get the statistics for a given query
 /// <PARAMETER>queryHash: the hash identifying the query</PARAMETER>
 /// <PARAMETER>namespace: optionaly the namespace the query was ran in</PARAMETER>
